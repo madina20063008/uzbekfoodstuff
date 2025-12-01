@@ -14,6 +14,7 @@ interface ImageUploaderProps {
   onPreviewsChange: (previews: string[]) => void
   productId: number | null
   uploadMode: "immediate" | "delayed"
+   disabled?: boolean // ← Yangi qo‘shildi
 }
 
 export function ImageUploader({

@@ -339,7 +339,7 @@ function ProductManagementContent() {
 
   const handleAddColor = async (
     colorId: number,
-    image: File | null,
+    image: string | File | null,
     price: string
   ) => {
     if (!selectedProductId) return;

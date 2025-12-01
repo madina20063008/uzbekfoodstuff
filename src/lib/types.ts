@@ -228,9 +228,10 @@ export interface Base64Image {
 
 export interface ProductColorData {
   colorId: number
-  image: File | null
+  image: string | File | null
   price: string
 }
+
 
 export interface ProductFeature {
   typeId: number
