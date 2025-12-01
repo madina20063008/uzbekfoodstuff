@@ -323,8 +323,8 @@ export default function AboutManagement() {
 
           {/* About Tab Content */}
           <TabsContent value="about">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
+            <Card className="bg-gray-100">
+              <CardHeader className="flex flex-row items-center justify-between ">
                 <div>
                   <CardTitle>{t("aboutManagement.sections")}</CardTitle>
                   <CardDescription>{t("aboutManagement.sectionsDescription")}</CardDescription>
@@ -408,7 +408,7 @@ export default function AboutManagement() {
 
           {/* Currency Tab Content */}
           <TabsContent value="currency">
-            <Card>
+            <Card className="bg-gray-100">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">

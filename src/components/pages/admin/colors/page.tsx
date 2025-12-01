@@ -209,7 +209,7 @@ function ColorsContent() {
           </Button>
         </div>
 
-        <Card>
+        <Card className="bg-gray-100">
           <CardHeader>
             <CardTitle>{t("colorManagement.colorList")}</CardTitle>
             <CardDescription>
@@ -220,7 +220,7 @@ function ColorsContent() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("colorManagement.id")}</TableHead>
+                  <TableHead>ID</TableHead>
                   <TableHead>{t("colorManagement.preview")}</TableHead>
                   <TableHead>{t("colorManagement.name")}</TableHead>
                   <TableHead className="text-right">

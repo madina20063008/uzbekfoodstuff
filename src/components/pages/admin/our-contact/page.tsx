@@ -284,7 +284,7 @@ export default function OurContactManagement() {
             </p>
           </div>
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen} >
             <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto bg-white border-gray-200">
               <DialogHeader>
                 <DialogTitle>
@@ -580,7 +580,7 @@ export default function OurContactManagement() {
             contactData.map((item, index) => (
               <Card
                 key={item.id}
-                className="animate-slide-in hover:shadow-lg transition-all duration-200"
+                className="animate-slide-in hover:shadow-lg transition-all duration-200 bg-gray-100"
                 style={{ animationDelay: `${index * 0.1 + 0.3}s` }}
               >
                 <CardHeader>

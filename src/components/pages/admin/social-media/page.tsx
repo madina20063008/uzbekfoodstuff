@@ -265,13 +265,13 @@ export default function SocialMediaManagement() {
         {/* Social Media Cards */}
         <div className="space-y-6">
           {isLoading ? (
-            <Card className="animate-slide-in">
+            <Card className="animate-slide-in bg-gray-100">
               <CardContent className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </CardContent>
             </Card>
           ) : socialData.length === 0 ? (
-            <Card className="animate-slide-in">
+            <Card className="animate-slide-in bg-gray-100">
               <CardContent className="text-center py-8">
                 <Share2 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-foreground mb-2">
@@ -288,7 +288,7 @@ export default function SocialMediaManagement() {
             </Card>
           ) : (
             socialData.map((item) => (
-              <Card key={item.id} className="animate-slide-in hover:shadow-lg transition-all duration-200">
+              <Card key={item.id} className="animate-slide-in hover:shadow-lg transition-all duration-200 bg-gray-100">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">

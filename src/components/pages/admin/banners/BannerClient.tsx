@@ -305,7 +305,7 @@ export default function BannerClient() {
         </div>
 
         {/* Data Table */}
-        <Card className="animate-slide-in" style={{ animationDelay: "0.3s" }}>
+        <Card className="animate-slide-in bg-gray-100" style={{ animationDelay: "0.3s" }}>
           <CardHeader>
             <CardTitle>{t("bannerManagement.bannerCollection")}</CardTitle>
             <CardDescription>

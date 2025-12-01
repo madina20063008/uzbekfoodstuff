@@ -201,7 +201,7 @@ export default function ContactManagement() {
         </div>
 
         {/* Filters */}
-        <Card className="animate-slide-in" style={{ animationDelay: "0.2s" }}>
+        <Card className="animate-slide-in bg-gray-100" style={{ animationDelay: "0.2s" }}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
@@ -243,7 +243,7 @@ export default function ContactManagement() {
         </Card>
 
         {/* Messages Table */}
-        <Card className="animate-slide-in" style={{ animationDelay: "0.3s" }}>
+        <Card className="animate-slide-in bg-gray-100" style={{ animationDelay: "0.3s" }}>
           <CardHeader>
             <CardTitle>{t("contactManagement.table.title")}</CardTitle>
             <CardDescription>
