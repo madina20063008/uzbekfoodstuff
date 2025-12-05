@@ -415,7 +415,7 @@ export default function OrdersPage() {
                 <div className="space-y-4">
                   {selectedOrder.items_detail?.map((item, i) => {
                     // Calculate item total
-                    const itemTotal = parseFloat(item.price) * parseInt(item.quantity);
+                    const itemTotal = parseFloat(item.price)
                     
                     return (
                       <div
