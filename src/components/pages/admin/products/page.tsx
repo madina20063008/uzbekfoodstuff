@@ -22,10 +22,12 @@ import { CategorySelector } from "../../../CategorySeletor";
 import type {Product,ProductColorData,ProductFeature,} from "../../../../lib/types";
 import Loader from "../../../ui/loader";
 import { apiFetch } from "../../../../lib/api";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next"; // ADD i18n import
+import { useCurrency } from "../../../../contexts/CurrencyContext";
 
 function ProductManagementContent() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { selectedCurrency } = useCurrency(); // ADD THIS
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<Product | null>(null);
   const [selectedColors, setSelectedColors] = useState<ProductColorData[]>([]);
@@ -39,6 +41,48 @@ function ProductManagementContent() {
   const [isColorSelectorOpen, setIsColorSelectorOpen] = useState(false);
   const [productColors, setProductColors] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Function to format price with currency
+  const formatPrice = (price: number | string) => {
+    const priceNum = typeof price === 'string' ? parseFloat(price) : price;
+    
+    // Handle invalid price values
+    if (isNaN(priceNum)) return "0.00";
+    
+    // Assuming API returns price in USD, you might need to adjust this
+    // based on how your backend stores prices
+    const convertedPrice = priceNum; // If prices are already in selected currency
+    
+    // If prices are stored in USD and you need to convert:
+    // You would need exchange rates from your currency API
+    // const convertedPrice = priceNum * exchangeRate;
+    
+    // Format the price based on the selected currency
+    if (selectedCurrency) {
+      // Determine which name to use based on current language
+      const currentLang = i18n.language || 'en';
+      let currencyName = selectedCurrency.name_en; // default to English
+      
+      if (currentLang.startsWith('uz')) {
+        currencyName = selectedCurrency.name_uz;
+      } else if (currentLang.startsWith('ru')) {
+        currencyName = selectedCurrency.name_ru;
+      } else {
+        currencyName = selectedCurrency.name_en;
+      }
+      
+      // Format price with appropriate decimal places
+      const formattedPrice = convertedPrice.toLocaleString(undefined, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
+      
+      return `${formattedPrice} ${currencyName}`;
+    }
+    
+    // Fallback to USD if no currency selected
+    return `$${priceNum.toFixed(2)}`;
+  };
 
   const blankForm = {
     id: 0,
@@ -338,73 +382,73 @@ function ProductManagementContent() {
   };
 
   const handleAddColor = async (
-    colorId: number,
-    image: string | File | null,
-    price: string
-  ) => {
-    if (!selectedProductId) return;
+  colorId: number,
+  image: string | File | null,
+  price: string
+) => {
+  if (!selectedProductId) return;
 
-    try {
-      const formData = new FormData();
-      formData.append("product", selectedProductId.toString());
-      formData.append("color", colorId.toString());
-      formData.append("price", price);
+  try {
+    const formData = new FormData();
+    formData.append("product", selectedProductId.toString());
+    formData.append("color", colorId.toString());
+    formData.append("price", price);
 
-      if (image) {
-        formData.append("image", image);
+    if (image) {
+      formData.append("image", image);
+    } else {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1;
+      canvas.height = 1;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.fillStyle = "transparent";
+        ctx.fillRect(0, 0, 1, 1);
+
+        const blob = await new Promise<Blob>((resolve) => {
+          canvas.toBlob(resolve as BlobCallback, "image/png");
+        });
+
+        const placeholderFile = new File([blob], "placeholder.png", {
+          type: "image/png",
+        });
+        formData.append("image", placeholderFile);
       } else {
-        const canvas = document.createElement("canvas");
-        canvas.width = 1;
-        canvas.height = 1;
-        const ctx = canvas.getContext("2d");
-        if (ctx) {
-          ctx.fillStyle = "transparent";
-          ctx.fillRect(0, 0, 1, 1);
-
-          const blob = await new Promise<Blob>((resolve) => {
-            canvas.toBlob(resolve as BlobCallback, "image/png");
-          });
-
-          const placeholderFile = new File([blob], "placeholder.png", {
-            type: "image/png",
-          });
-          formData.append("image", placeholderFile);
-        } else {
-          throw new Error("Could not create placeholder image");
-        }
+        throw new Error("Could not create placeholder image");
       }
-
-      const response = await authService.makeAuthenticatedRequest(
-        "/product/create-product-colors/",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Server response:", errorText);
-        throw new Error(`Failed to add color: ${response.status} ${errorText}`);
-      }
-
-      await fetchProductColors(selectedProductId);
-
-      toast({
-        title: t("productManagement.success"),
-        description: t("productManagement.colorAdded"),
-      });
-
-      setIsColorSelectorOpen(false);
-    } catch (error) {
-      console.error("Error adding color:", error);
-      toast({
-        title: t("productManagement.error"),
-        description: t("productManagement.failedAddColor"),
-        variant: "destructive",
-      });
     }
-  };
+
+    const response = await authService.makeAuthenticatedRequest(
+      "/product/create-product-colors/",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Server response:", errorText);
+      throw new Error(`Failed to add color: ${response.status} ${errorText}`);
+    }
+
+    await fetchProductColors(selectedProductId);
+
+    toast({
+      title: t("productManagement.success"),
+      description: t("productManagement.colorAdded"),
+    });
+
+    setIsColorSelectorOpen(false);
+  } catch (error) {
+    console.error("Error adding color:", error);
+    toast({
+      title: t("productManagement.error"),
+      description: t("productManagement.failedAddColor"),
+      variant: "destructive", // FIXED: Added quotes around "destructive"
+    });
+  }
+};
 
   const handleRemoveColor = async (productColorId: number) => {
     if (!selectedProductId) return;
@@ -645,38 +689,52 @@ function ProductManagementContent() {
                           <Label htmlFor="price">
                             {t("productManagement.price")}
                           </Label>
-                          <Input
-                            id="price"
-                            type="text"
-                            value={formData.price}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                price: e.target.value,
-                              })
-                            }
-                            placeholder="Ex: 50000"
-                            required
-                            disabled={isSubmitting}
-                          />
+                          <div className="flex items-center gap-2">
+                            <Input
+                              id="price"
+                              type="text"
+                              value={formData.price}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  price: e.target.value,
+                                })
+                              }
+                              placeholder="Ex: 50000"
+                              required
+                              disabled={isSubmitting}
+                            />
+                            {selectedCurrency && (
+                              <span className="text-sm text-gray-500 whitespace-nowrap">
+                                ({selectedCurrency.name_en})
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="old_price">
                             {t("productManagement.oldPrice")}
                           </Label>
-                          <Input
-                            id="old_price"
-                            type="text"
-                            value={formData.old_price}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                old_price: e.target.value,
-                              })
-                            }
-                            placeholder="Ex: 55000"
-                            disabled={isSubmitting}
-                          />
+                          <div className="flex items-center gap-2">
+                            <Input
+                              id="old_price"
+                              type="text"
+                              value={formData.old_price}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  old_price: e.target.value,
+                                })
+                              }
+                              placeholder="Ex: 55000"
+                              disabled={isSubmitting}
+                            />
+                            {selectedCurrency && (
+                              <span className="text-sm text-gray-500 whitespace-nowrap">
+                                ({selectedCurrency.name_en})
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
@@ -750,25 +808,34 @@ function ProductManagementContent() {
                 {t("productManagement.description")}
               </CardDescription>
             </CardHeader>
-            {/* Fix: Create a separate CategoryFilter component or use inline filtering */}
-            <div className="flex items-center space-x-2">
-              <Label htmlFor="category-filter">{t("category")}</Label>
-              <select
-                id="category-filter"
-                value={filterCategory || 0}
-                onChange={(e) => {
-                  const value = Number(e.target.value);
-                  setFilterCategory(value === 0 ? null : value);
-                }}
-                className="border rounded-md px-3 py-2"
-              >
-                <option value={0}>{t("allCategories")}</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name_en}
-                  </option>
-                ))}
-              </select>
+            {/* Currency Info Display */}
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-500">
+                {selectedCurrency && (
+                  <div className="bg-gray-100 px-3 py-1 rounded-md">
+                    Currency: {selectedCurrency.name_en}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center space-x-2">
+                <Label htmlFor="category-filter">{t("category")}</Label>
+                <select
+                  id="category-filter"
+                  value={filterCategory || 0}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
+                    setFilterCategory(value === 0 ? null : value);
+                  }}
+                  className="border rounded-md px-3 py-2"
+                >
+                  <option value={0}>{t("allCategories")}</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name_en}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
           <CardContent>
@@ -824,7 +891,10 @@ function ProductManagementContent() {
                         <TableCell className="max-w-[200px] truncate">
                           {prod.description}
                         </TableCell>
-                        <TableCell>{prod.price}</TableCell>
+                        <TableCell>
+                          {/* CHANGED: Use formatPrice instead of raw price */}
+                          {formatPrice(prod.price)}
+                        </TableCell>
                         <TableCell>
                           {prod.features?.length || 0} {t("features")}
                         </TableCell>
@@ -999,7 +1069,8 @@ function ProductManagementContent() {
                                   {color?.name || `Color ${productColor.color}`}
                                 </div>
                                 <div className="text-sm text-muted-foreground">
-                                  {productColor.price}
+                                  {/* CHANGED: Use formatPrice for color price display */}
+                                  {formatPrice(productColor.price)}
                                 </div>
                               </div>
                             </div>
@@ -1067,7 +1138,8 @@ function ProductManagementContent() {
                         {prod.title}
                       </div>
                       <div className="text-xs opacity-90">
-                        ${prod.price} • {prod.colors?.length || 0} colors •{" "}
+                        {/* CHANGED: Use formatPrice instead of $ */}
+                        {formatPrice(prod.price)} • {prod.colors?.length || 0} colors •{" "}
                         {prod.features?.length || 0} features
                       </div>
                     </div>

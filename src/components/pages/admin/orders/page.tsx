@@ -29,9 +29,11 @@ import { authService } from "../../../../lib/auth";
 import type { Order } from "../../../../lib/types";
 import Loader from "../../../ui/loader";
 import { useTranslation } from "react-i18next";
+import { useCurrency } from "../../../../contexts/CurrencyContext";
 
 export default function OrdersPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { selectedCurrency } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -128,6 +130,39 @@ export default function OrdersPage() {
     });
   };
 
+  // Function to format price with currency
+  const formatPrice = (price: number | string) => {
+    const priceNum = typeof price === 'string' ? parseFloat(price) : price;
+    
+    // Assuming API returns price in USD, you might need to adjust this
+    // based on how your backend stores prices
+    const convertedPrice = priceNum; // If prices are already in selected currency
+    
+    // If prices are stored in USD and you need to convert:
+    // You would need exchange rates from your currency API
+    // const convertedPrice = priceNum * exchangeRate;
+    
+    // Format the price based on the selected currency
+    if (selectedCurrency) {
+      // Determine which name to use based on current language
+      const currentLang = i18n.language || 'en';
+      let currencyName = selectedCurrency.name_en; // default to English
+      
+      if (currentLang.startsWith('uz')) {
+        currencyName = selectedCurrency.name_uz;
+      } else if (currentLang.startsWith('ru')) {
+        currencyName = selectedCurrency.name_ru;
+      } else {
+        currencyName = selectedCurrency.name_en;
+      }
+      
+      return `${convertedPrice.toFixed(2)} ${currencyName}`;
+    }
+    
+    // Fallback to USD if no currency selected
+    return `$${priceNum.toFixed(2)}`;
+  };
+
   const openOrderModal = (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
@@ -212,7 +247,7 @@ export default function OrdersPage() {
                     {order.additional_phone_number}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
-                    ${order.price}
+                    {formatPrice(order.price)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div
@@ -379,11 +414,9 @@ export default function OrdersPage() {
 
                 <div className="space-y-4">
                   {selectedOrder.items_detail?.map((item, i) => {
-                    // FIXED: Removed the unused itemTotal variable
-                    // const itemTotal = (
-                    //   parseFloat(item.price) * parseInt(item.quantity)
-                    // ).toFixed(2);
-
+                    // Calculate item total
+                    const itemTotal = parseFloat(item.price) * parseInt(item.quantity);
+                    
                     return (
                       <div
                         key={i}
@@ -394,21 +427,17 @@ export default function OrdersPage() {
                             {item.product}
                           </h4>
                           <span className="font-semibold text-gray-900">
-                            ${parseFloat(item.price).toFixed(1)}
+                            {formatPrice(itemTotal)}
                           </span>
                         </div>
 
                         <div className="flex justify-between text-sm text-gray-600 mb-3">
                           <span>
-                            $
-                            {(
-                              parseFloat(item.price) / parseInt(item.quantity)
-                            ).toFixed(1)}{" "}
+                            {formatPrice(parseFloat(item.price) / parseInt(item.quantity))}{" "}
                             × {item.quantity}
                           </span>
                           <span>
-                            {t("orders.subtotal")}: $
-                            {parseFloat(item.price).toFixed(1)}
+                            {t("orders.subtotal")}: {formatPrice(itemTotal)}
                           </span>
                         </div>
 
@@ -459,7 +488,7 @@ export default function OrdersPage() {
                 <div className="mt-6 pt-4 border-t border-gray-300">
                   <div className="flex justify-between items-center text-lg font-bold text-gray-900">
                     <span>{t("orders.orderTotal")}</span>
-                    <span>${selectedOrder.price}</span>
+                    <span>{formatPrice(selectedOrder.price)}</span>
                   </div>
                 </div>
 

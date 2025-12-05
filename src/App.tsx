@@ -31,12 +31,14 @@ import { ProductColorsProvider } from "./contexts/ProductColorsContext";
 import { TypesProvider } from "./contexts/TypesContext";
 import AdminDashboard from "./components/pages/admin/page";
 import { AdminWrapper } from "./components/AdminWrapper";
+import { CurrencyProvider } from "./contexts/CurrencyContext";
 
 function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <AuthProvider>
-        <CategoriesProvider>
+        <CurrencyProvider>
+          <CategoriesProvider>
           <ColorsProvider>
             <FeaturesProvider>
               <ProductColorsProvider>
@@ -89,6 +91,8 @@ function App() {
             </FeaturesProvider>
           </ColorsProvider>
         </CategoriesProvider>
+        </CurrencyProvider>
+        
       </AuthProvider>
     </ThemeProvider>
   );
