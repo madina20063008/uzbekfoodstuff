@@ -24,8 +24,7 @@ export function CategorySelector({ selectedCategory, onCategoryChange }: Categor
   }
 
   return (
-    <div>
-      <Label className="mb-2" htmlFor="category">{t("Category")}</Label>
+    <div className="bg-white">
       <Select
         value={selectedCategory ? selectedCategory.toString() : "0"}
         onValueChange={(val: string) => onCategoryChange(Number(val))}
@@ -33,7 +32,7 @@ export function CategorySelector({ selectedCategory, onCategoryChange }: Categor
         <SelectTrigger>
           <SelectValue placeholder={t("Selectcategory")} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white">
           <SelectItem value="0">{t("AllCategories")}</SelectItem>
 
           {/* ✅ Render all categories */}

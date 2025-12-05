@@ -188,7 +188,7 @@ export default function OrdersPage() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
       >
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4">
           {t("orders.title")}
         </h1>
         <motion.div

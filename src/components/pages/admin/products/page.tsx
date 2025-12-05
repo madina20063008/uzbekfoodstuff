@@ -503,7 +503,7 @@ function ProductManagementContent() {
         <div className="animate-slide-in flex flex-col md:flex-row items-center justify-between">
           <div className="flex items-center gap-6">
             <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
+              <h1 className="text-xl md:text-3xl font-bold flex items-center gap-3">
                 <Plus className="h-6 w-6 md:h-8 md:w-8 text-primary" />{" "}
                 {t("productManagement.title")}
               </h1>
@@ -801,7 +801,7 @@ function ProductManagementContent() {
 
         {/* Product Table */}
         <Card>
-          <div className="flex justify-between px-2">
+          <div className="flex flex-wrap justify-between px-2">
             <CardHeader className="w-full">
               <CardTitle>{t("productManagement.productList")}</CardTitle>
               <CardDescription>
@@ -810,14 +810,8 @@ function ProductManagementContent() {
             </CardHeader>
             {/* Currency Info Display */}
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-500">
-                {selectedCurrency && (
-                  <div className="bg-gray-100 px-3 py-1 rounded-md">
-                    Currency: {selectedCurrency.name_en}
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center space-x-2">
+              
+              <div className="flex items-center space-x-2 pl-6 md:pl-0">
                 <Label htmlFor="category-filter">{t("category")}</Label>
                 <select
                   id="category-filter"
